@@ -17,13 +17,13 @@ all: $(NAME)
 re: fclean all
 
 clean:
-	rm -f $(OBJECTS) $(BONUS_OBJECTS)
+	rm -f $(OBJECTS) $(BONUS_OBJECTS) test
 
 fclean: clean
 	rm -f $(NAME)
 
 test: test.c $(NAME)
-	cc $< $^ -o $@
+	cc $^ -o $@
 	./$@
 
 .PHONY: all re fclean clean bonus test
