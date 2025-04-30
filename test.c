@@ -54,10 +54,9 @@ int main()
 
 	// Open a temporary file and redirect standard output to that file.
 	int temporary_file = open("temp", O_RDWR | O_CREAT, 0666);
-	unlink("temp"); // Remove the file (it disappears the moment it's closed);
+	unlink("temp"); // Remove the file (it disappears the moment it's closed).
 	dup2(temporary_file, 1); // All writes to 1 actually go to temporary_file.
 
-	// FIXME: Tests p 6, 8, 9
 	// Run test cases (see macro above).
 	TEST_CASE(NULL);
 	TEST_CASE("");

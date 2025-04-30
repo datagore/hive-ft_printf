@@ -6,12 +6,13 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/04/30 16:25:00 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/04/30 22:26:07 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <unistd.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <unistd.h>
 
 #include "ft_printf.h"
 
@@ -41,17 +42,29 @@ static int	write_escape_string(va_list *args)
 	return (write(1, string, ft_strlen(string)));
 }
 
-// FIXME: Can't use __int128 presumably.
-static int	write_digits(__int128 value, const char *digits, int base)
+static int	write_unsigned(uintptr_t value, const char *digits, uintptr_t base)
 {
 	int	written;
 
-	written = 1 + (value < 0);
+	written = 1;
+	if (value >= base)
+		written += write_unsigned(value / base, digits, base);
+	write(1, &digits[value % base], 1);
+	return (written);
+}
+
+static int	write_digits(intptr_t value, const char *digits, intptr_t base)
+{
+	int	written;
+
+	written = 0;
 	if (value < 0)
 	{
 		write(1, "-", 1);
 		value = -value;
+		written++;
 	}
+	return written + write_unsigned(value, digits, base);
 	if (value >= base)
 		written += write_digits(value / base, digits, base);
 	write(1, &digits[value % base], 1);
@@ -82,7 +95,7 @@ static int	write_escape(char esc, va_list *args)
 		if (pointer == 0)
 			return (write(1, "(nil)", 5));
 		write(1, "0x", 2);
-		return (2 + write_digits(pointer, "0123456789abcdef", 16));
+		return (2 + write_unsigned(pointer, "0123456789abcdef", 16));
 	}
 	return (0);
 }
