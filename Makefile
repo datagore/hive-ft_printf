@@ -3,7 +3,7 @@ SOURCES := ft_printf.c \
 OBJECTS := $(SOURCES:%.c=%.o)
 
 HEADERS := ft_printf.h
-NAME := libprintf.a
+NAME := libftprintf.a
 CFLAGS = -Wall -Wextra -Werror
 
 $(NAME): $(OBJECTS)
