@@ -43,7 +43,6 @@
 
 int main()
 {
-
 	// Keep a count of how many test cases passed or failed.
 	int total_passed = 0;
 	int total_tested = 0;
@@ -64,7 +63,7 @@ int main()
 	TEST_CASE("percentage: 100%%");
 	TEST_CASE("character: %c", '@');
 	TEST_CASE("string: %s", "hello");
-	TEST_CASE("null string: %s", NULL);
+	TEST_CASE("null string: %s", (char*) NULL);
 	TEST_CASE("decimal: %d", -42);
 	TEST_CASE("decimal: %i", 420);
 	TEST_CASE("hexadecimal: %x", 255);
@@ -72,7 +71,7 @@ int main()
 	TEST_CASE("hex negative: %x", -128);
 	TEST_CASE("pointer: %p", main);
 	TEST_CASE("null pointer: %p", NULL);
-	TEST_CASE("LONG_MIN pointer: %p", LONG_MIN);
+	TEST_CASE("LONG_MIN pointer: %p", (void*) LONG_MIN);
 	TEST_CASE("LONG_MAX pointer: %p", LONG_MAX);
 	TEST_CASE("+ULONG_MAX pointer: %p", +ULONG_MAX);
 	TEST_CASE("-ULONG_MAX pointer: %p", -ULONG_MAX);
@@ -82,6 +81,8 @@ int main()
 	TEST_CASE("UINT_MIN: %u", 0);
 	TEST_CASE("UINT_MAX hex: %x", 4294967295);
 	TEST_CASE("UINT_MIN hex: %x", 0);
+	TEST_CASE("invalid conversion: %w");
+	TEST_CASE("trailing percent: %");
 
 	// Print a summary of all test cases.
 	fprintf(stderr, "\n%d/%d tests passed", total_passed, total_tested);

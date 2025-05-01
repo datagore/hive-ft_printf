@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/04/30 22:26:07 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/01 13:56:48 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,34 +26,30 @@ static size_t	ft_strlen(const char *string)
 	return (length);
 }
 
-static int	write_escape_char(va_list *args)
+static int	write_char(char character)
 {
-	const char	character = (char) va_arg(*args, int);
-
 	return (write(1, &character, 1));
 }
 
-static int	write_escape_string(va_list *args)
+static int	write_string(const char *string)
 {
-	const char *const	string = va_arg(*args, const char*);
-
 	if (string == NULL)
-		return (write(1, "(null)", 6));
+		string = "(null)";
 	return (write(1, string, ft_strlen(string)));
 }
 
-static int	write_unsigned(uintptr_t value, const char *digits, uintptr_t base)
+static int	write_uint(uintptr_t value, const char *digits, uintptr_t base)
 {
 	int	written;
 
 	written = 1;
 	if (value >= base)
-		written += write_unsigned(value / base, digits, base);
+		written += write_uint(value / base, digits, base);
 	write(1, &digits[value % base], 1);
 	return (written);
 }
 
-static int	write_digits(intptr_t value, const char *digits, intptr_t base)
+static int	write_int(intptr_t value, const char *digits, intptr_t base)
 {
 	int	written;
 
@@ -64,40 +60,35 @@ static int	write_digits(intptr_t value, const char *digits, intptr_t base)
 		value = -value;
 		written++;
 	}
-	return written + write_unsigned(value, digits, base);
-	if (value >= base)
-		written += write_digits(value / base, digits, base);
-	write(1, &digits[value % base], 1);
-	return (written);
+	return (written + write_uint(value, digits, base));
+}
+
+static int	write_pointer(uintptr_t pointer)
+{
+	if (pointer == 0)
+		return (write_string("(nil)"));
+	return (write_string("0x") + write_uint(pointer, "0123456789abcdef", 16));
 }
 
 static int	write_escape(char esc, va_list *args)
 {
-	unsigned long long	pointer;
-
 	if (esc == '%')
 		return (write(1, "%", 1));
-	else if (esc == 'c')
-		return (write_escape_char(args));
-	else if (esc == 's')
-		return (write_escape_string(args));
-	else if (esc == 'd' || esc == 'i')
-		return (write_digits(va_arg(*args, int), "0123456789", 10));
-	else if (esc == 'u')
-		return (write_digits(va_arg(*args, unsigned), "0123456789", 10));
-	else if (esc == 'x')
-		return (write_digits(va_arg(*args, unsigned), "0123456789abcdef", 16));
-	else if (esc == 'X')
-		return (write_digits(va_arg(*args, unsigned), "0123456789ABCDEF", 16));
-	else if (esc == 'p')
-	{
-		pointer = va_arg(*args, unsigned long long);
-		if (pointer == 0)
-			return (write(1, "(nil)", 5));
-		write(1, "0x", 2);
-		return (2 + write_unsigned(pointer, "0123456789abcdef", 16));
-	}
-	return (0);
+	if (esc == 'c')
+		return (write_char(va_arg(*args, int)));
+	if (esc == 's')
+		return (write_string(va_arg(*args, const char *)));
+	if (esc == 'd' || esc == 'i')
+		return (write_int(va_arg(*args, int), "0123456789", 10));
+	if (esc == 'u')
+		return (write_int(va_arg(*args, unsigned), "0123456789", 10));
+	if (esc == 'x')
+		return (write_int(va_arg(*args, unsigned), "0123456789abcdef", 16));
+	if (esc == 'X')
+		return (write_int(va_arg(*args, unsigned), "0123456789ABCDEF", 16));
+	if (esc == 'p')
+		return (write_pointer(va_arg(*args, uintptr_t)));
+	return (write_char('%') + write_char(esc));
 }
 
 int	ft_printf(const char *format, ...)
