@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/01 13:56:48 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/01 20:50:24 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,11 @@
 
 static size_t	ft_strlen(const char *string)
 {
-	size_t	length;
+	const char *const	start = string;
 
-	length = 0;
-	while (string != NULL && string[length] != '\0')
-		length++;
-	return (length);
+	while (string != NULL && *string != '\0')
+		string++;
+	return (string - start);
 }
 
 static int	write_char(char character)

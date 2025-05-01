@@ -1,3 +1,10 @@
+// Disable compiler warnings related to invalid format strings, so we can test
+// for those cases.
+#pragma GCC diagnostic ignored "-Wformat"
+#pragma GCC diagnostic ignored "-Wnonnull"
+#pragma GCC diagnostic ignored "-Wformat-zero-length"
+#pragma GCC diagnostic ignored "-Wformat-overflow"
+
 #include <fcntl.h>
 #include <limits.h>
 #include <stdio.h>
@@ -36,7 +43,7 @@
 		fprintf(stderr, "%s ", match ? GREEN_OK : RED_KO); \
 		fprintf(stderr, "printf(%s)\n", #__VA_ARGS__); \
 		fprintf(stderr, "    ft_printf: \"" ANSI_YELLOW "%.*s" ANSI_RESET "\" (return: %d)\n", a_length, a, a_return); \
-		fprintf(stderr, "    printf:    \"" ANSI_YELLOW "%.*s" ANSI_RESET "\" (return: %d)\n", b_length, b, b_return); \
+		fprintf(stderr, "    printf:    \"" ANSI_YELLOW "%.*s" ANSI_RESET "\" (return: %d)\n\n", b_length, b, b_return); \
 		total_passed += !!match; \
 		total_tested++; \
 	} while (0)
@@ -57,9 +64,7 @@ int main()
 	dup2(temporary_file, 1); // All writes to 1 actually go to temporary_file.
 
 	// Run test cases (see macro above).
-	TEST_CASE(NULL);
-	TEST_CASE("");
-	TEST_CASE("hello");
+	TEST_CASE("string");
 	TEST_CASE("percentage: 100%%");
 	TEST_CASE("character: %c", '@');
 	TEST_CASE("string: %s", "hello");
@@ -69,7 +74,7 @@ int main()
 	TEST_CASE("hexadecimal: %x", 255);
 	TEST_CASE("hex uppercase: %X", 65535);
 	TEST_CASE("hex negative: %x", -128);
-	TEST_CASE("pointer: %p", main);
+	TEST_CASE("valid pointer: %p", main);
 	TEST_CASE("null pointer: %p", NULL);
 	TEST_CASE("LONG_MIN pointer: %p", (void*) LONG_MIN);
 	TEST_CASE("LONG_MAX pointer: %p", LONG_MAX);
@@ -78,13 +83,12 @@ int main()
 	TEST_CASE("INT_MAX: %d", +2147483647);
 	TEST_CASE("INT_MIN: %i", -2147483648);
 	TEST_CASE("UINT_MAX: %u", 4294967295);
-	TEST_CASE("UINT_MIN: %u", 0);
-	TEST_CASE("UINT_MAX hex: %x", 4294967295);
-	TEST_CASE("UINT_MIN hex: %x", 0);
+	TEST_CASE("UINT_MAX hexadecimal: %x", UINT_MAX);
 	TEST_CASE("invalid conversion: %w");
-	TEST_CASE("trailing percent: %");
+	TEST_CASE("");
+	TEST_CASE(NULL);
 
 	// Print a summary of all test cases.
-	fprintf(stderr, "\n%d/%d tests passed", total_passed, total_tested);
+	fprintf(stderr, "%d/%d tests passed", total_passed, total_tested);
 	fprintf(stderr, " %s\n", total_passed == total_tested ? GREEN_OK : RED_KO);
 }

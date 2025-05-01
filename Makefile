@@ -23,7 +23,7 @@ fclean: clean
 	rm -f $(NAME)
 
 test: test.c $(NAME)
-	cc $^ -o $@
+	cc $^ -o $@ $(CFLAGS)
 	./$@
 
 .PHONY: all re fclean clean bonus test
