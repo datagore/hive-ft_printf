@@ -3,7 +3,9 @@
 #pragma GCC diagnostic ignored "-Wformat"
 #pragma GCC diagnostic ignored "-Wnonnull"
 #pragma GCC diagnostic ignored "-Wformat-zero-length"
+#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wformat-overflow"
+#endif
 
 #include <fcntl.h>
 #include <limits.h>
