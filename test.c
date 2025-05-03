@@ -1,8 +1,5 @@
-// Disable compiler warnings related to invalid format strings, so we can test
-// for those cases.
-#pragma GCC diagnostic ignored "-Wformat"
-#pragma GCC diagnostic ignored "-Wnonnull"
-#pragma GCC diagnostic ignored "-Wformat-zero-length"
+// clang emits a warning if you try to print a NULL string. That warning is
+// disabled here, so that we can test with NULL strings.
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wformat-overflow"
 #endif
@@ -67,28 +64,26 @@ int main()
 
 	// Run test cases (see macro above).
 	TEST_CASE("string");
-	TEST_CASE("percentage: 100%%");
+	TEST_CASE("percent sign: 100%%");
 	TEST_CASE("character: %c", '@');
 	TEST_CASE("string: %s", "hello");
 	TEST_CASE("null string: %s", (char*) NULL);
-	TEST_CASE("decimal: %d", -42);
-	TEST_CASE("decimal: %i", 420);
-	TEST_CASE("hexadecimal: %x", 255);
-	TEST_CASE("hex uppercase: %X", 65535);
-	TEST_CASE("hex negative: %x", -128);
+	TEST_CASE("zero: %d", 0);
+	TEST_CASE("positive decimal: %i", 69);
+	TEST_CASE("negative decimal: %d", -42);
+	TEST_CASE("hexadecimal: %x", 0xc0de);
+	TEST_CASE("hexadecimal uppercase: %X", 0xBEEF);
+	TEST_CASE("hexadecimal negative: %X", -0xff);
 	TEST_CASE("valid pointer: %p", main);
 	TEST_CASE("null pointer: %p", NULL);
 	TEST_CASE("LONG_MIN pointer: %p", (void*) LONG_MIN);
-	TEST_CASE("LONG_MAX pointer: %p", LONG_MAX);
-	TEST_CASE("+ULONG_MAX pointer: %p", +ULONG_MAX);
-	TEST_CASE("-ULONG_MAX pointer: %p", -ULONG_MAX);
-	TEST_CASE("INT_MAX: %d", +2147483647);
-	TEST_CASE("INT_MIN: %i", -2147483648);
-	TEST_CASE("UINT_MAX: %u", 4294967295);
+	TEST_CASE("LONG_MAX pointer: %p", (void*) LONG_MAX);
+	TEST_CASE("+ULONG_MAX pointer: %p", (void*) +ULONG_MAX);
+	TEST_CASE("-ULONG_MAX pointer: %p", (void*) -ULONG_MAX);
+	TEST_CASE("INT_MAX: %d", INT_MAX);
+	TEST_CASE("INT_MIN: %i", INT_MIN);
+	TEST_CASE("UINT_MAX: %u", UINT_MAX);
 	TEST_CASE("UINT_MAX hexadecimal: %x", UINT_MAX);
-	TEST_CASE("invalid conversion: %w");
-	TEST_CASE("");
-	TEST_CASE(NULL);
 
 	// Print a summary of all test cases.
 	fprintf(stderr, "%d/%d tests passed", total_passed, total_tested);

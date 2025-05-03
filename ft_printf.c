@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/01 20:50:24 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/04 00:00:29 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,9 @@
 
 #include "ft_printf.h"
 
-static size_t	ft_strlen(const char *string)
-{
-	const char *const	start = string;
-
-	while (string != NULL && *string != '\0')
-		string++;
-	return (string - start);
-}
+#define DECIMAL "0123456789"
+#define HEX_LOWERCASE "0123456789abcdef"
+#define HEX_UPPERCASE "0123456789ABCDEF"
 
 static int	write_char(char character)
 {
@@ -32,80 +27,106 @@ static int	write_char(char character)
 
 static int	write_string(const char *string)
 {
+	int	count;
+
 	if (string == NULL)
 		string = "(null)";
-	return (write(1, string, ft_strlen(string)));
+	count = 0;
+	while (string[count] != '\0')
+		count++;
+	return (write(1, string, count));
 }
 
 static int	write_uint(uintptr_t value, const char *digits, uintptr_t base)
 {
-	int	written;
+	int	count;
 
-	written = 1;
+	count = 0;
 	if (value >= base)
-		written += write_uint(value / base, digits, base);
-	write(1, &digits[value % base], 1);
-	return (written);
+		count = write_uint(value / base, digits, base);
+	if (count < 0 || write_char(digits[value % base]) < 0)
+		return (-1);
+	return (1 + count);
 }
 
 static int	write_int(intptr_t value, const char *digits, intptr_t base)
 {
-	int	written;
+	uintptr_t	abs;
+	int			count;
 
-	written = 0;
+	abs = value;
 	if (value < 0)
 	{
-		write(1, "-", 1);
-		value = -value;
-		written++;
+		if (write_char('-') < 0)
+			return (-1);
+		abs = -value;
 	}
-	return (written + write_uint(value, digits, base));
+	count = write_uint(abs, digits, base);
+	if (count < 0)
+		return (-1);
+	return (count + (value < 0));
 }
 
 static int	write_pointer(uintptr_t pointer)
 {
+	int	count;
+
 	if (pointer == 0)
 		return (write_string("(nil)"));
-	return (write_string("0x") + write_uint(pointer, "0123456789abcdef", 16));
+	if (write_string("0x") < 0)
+		return (-1);
+	count = write_uint(pointer, HEX_LOWERCASE, 16);
+	if (count < 0)
+		return (-1);
+	return (count + 2);
 }
 
 static int	write_escape(char esc, va_list *args)
 {
+	if (esc == '\0')
+		return (-1);
 	if (esc == '%')
-		return (write(1, "%", 1));
+		return (write_char('%'));
 	if (esc == 'c')
 		return (write_char(va_arg(*args, int)));
 	if (esc == 's')
 		return (write_string(va_arg(*args, const char *)));
 	if (esc == 'd' || esc == 'i')
-		return (write_int(va_arg(*args, int), "0123456789", 10));
+		return (write_int(va_arg(*args, int), DECIMAL, 10));
 	if (esc == 'u')
-		return (write_int(va_arg(*args, unsigned), "0123456789", 10));
+		return (write_int(va_arg(*args, unsigned int), DECIMAL, 10));
 	if (esc == 'x')
-		return (write_int(va_arg(*args, unsigned), "0123456789abcdef", 16));
+		return (write_int(va_arg(*args, unsigned int), HEX_LOWERCASE, 16));
 	if (esc == 'X')
-		return (write_int(va_arg(*args, unsigned), "0123456789ABCDEF", 16));
+		return (write_int(va_arg(*args, unsigned int), HEX_UPPERCASE, 16));
 	if (esc == 'p')
 		return (write_pointer(va_arg(*args, uintptr_t)));
-	return (write_char('%') + write_char(esc));
+	if (write_char('%') < 0 || write_char(esc) < 0)
+		return (-1);
+	return (2);
 }
 
 int	ft_printf(const char *format, ...)
 {
 	va_list	args;
-	int		written;
+	int		count;
+	int		total;
 
 	if (format == NULL)
 		return (-1);
-	written = 0;
 	va_start(args, format);
-	while (*format)
+	total = 0;
+	while (*format && total >= 0)
 	{
-		if (*format++ == '%')
-			written += write_escape(*format++, &args);
+		if (*format == '%')
+			count = write_escape(*++format, &args);
 		else
-			written += write(1, format - 1, 1);
+			count = write_char(*format);
+		total += count;
+		if (count < 0)
+			total = -1;
+		format++;
 	}
 	va_end(args);
-	return (written);
+	return (total);
 }
