@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/04 00:00:29 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/04 10:45:35 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,81 +27,81 @@ static int	write_char(char character)
 
 static int	write_string(const char *string)
 {
-	int	count;
+	int	length;
 
 	if (string == NULL)
 		string = "(null)";
-	count = 0;
-	while (string[count] != '\0')
-		count++;
-	return (write(1, string, count));
+	length = 0;
+	while (string[length] != '\0')
+		length++;
+	return (write(1, string, length));
 }
 
 static int	write_uint(uintptr_t value, const char *digits, uintptr_t base)
 {
-	int	count;
+	int	length;
 
-	count = 0;
+	length = 0;
 	if (value >= base)
-		count = write_uint(value / base, digits, base);
-	if (count < 0 || write_char(digits[value % base]) < 0)
+		length = write_uint(value / base, digits, base);
+	if (length < 0 || write_char(digits[value % base]) < 0)
 		return (-1);
-	return (1 + count);
+	return (length + 1);
 }
 
-static int	write_int(intptr_t value, const char *digits, intptr_t base)
+static int	write_int(intptr_t signed_value, const char *digits, intptr_t base)
 {
-	uintptr_t	abs;
-	int			count;
+	uintptr_t	unsigned_value;
+	int			length;
 
-	abs = value;
-	if (value < 0)
+	unsigned_value = signed_value;
+	if (signed_value < 0)
 	{
 		if (write_char('-') < 0)
 			return (-1);
-		abs = -value;
+		unsigned_value = -signed_value;
 	}
-	count = write_uint(abs, digits, base);
-	if (count < 0)
+	length = write_uint(unsigned_value, digits, base);
+	if (length < 0)
 		return (-1);
-	return (count + (value < 0));
+	return (length + (signed_value < 0));
 }
 
 static int	write_pointer(uintptr_t pointer)
 {
-	int	count;
+	int	length;
 
 	if (pointer == 0)
 		return (write_string("(nil)"));
 	if (write_string("0x") < 0)
 		return (-1);
-	count = write_uint(pointer, HEX_LOWERCASE, 16);
-	if (count < 0)
+	length = write_uint(pointer, HEX_LOWERCASE, 16);
+	if (length < 0)
 		return (-1);
-	return (count + 2);
+	return (length + 2);
 }
 
-static int	write_escape(char esc, va_list *args)
+static int	write_conversion(char conversion, va_list *args)
 {
-	if (esc == '\0')
+	if (conversion == '\0')
 		return (-1);
-	if (esc == '%')
+	if (conversion == '%')
 		return (write_char('%'));
-	if (esc == 'c')
+	if (conversion == 'c')
 		return (write_char(va_arg(*args, int)));
-	if (esc == 's')
+	if (conversion == 's')
 		return (write_string(va_arg(*args, const char *)));
-	if (esc == 'd' || esc == 'i')
+	if (conversion == 'd' || conversion == 'i')
 		return (write_int(va_arg(*args, int), DECIMAL, 10));
-	if (esc == 'u')
+	if (conversion == 'u')
 		return (write_int(va_arg(*args, unsigned int), DECIMAL, 10));
-	if (esc == 'x')
+	if (conversion == 'x')
 		return (write_int(va_arg(*args, unsigned int), HEX_LOWERCASE, 16));
-	if (esc == 'X')
+	if (conversion == 'X')
 		return (write_int(va_arg(*args, unsigned int), HEX_UPPERCASE, 16));
-	if (esc == 'p')
+	if (conversion == 'p')
 		return (write_pointer(va_arg(*args, uintptr_t)));
-	if (write_char('%') < 0 || write_char(esc) < 0)
+	if (write_char('%') < 0 || write_char(conversion) < 0)
 		return (-1);
 	return (2);
 }
@@ -109,21 +109,21 @@ static int	write_escape(char esc, va_list *args)
 int	ft_printf(const char *format, ...)
 {
 	va_list	args;
-	int		count;
+	int		length;
 	int		total;
 
 	if (format == NULL)
 		return (-1);
 	va_start(args, format);
 	total = 0;
-	while (*format && total >= 0)
+	while (*format != '\0' && total >= 0)
 	{
 		if (*format == '%')
-			count = write_escape(*++format, &args);
+			length = write_conversion(*++format, &args);
 		else
-			count = write_char(*format);
-		total += count;
-		if (count < 0)
+			length = write_char(*format);
+		total += length;
+		if (length < 0)
 			total = -1;
 		format++;
 	}
