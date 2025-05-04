@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/04 10:45:35 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/04 12:49:20 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,11 +94,11 @@ static int	write_conversion(char conversion, va_list *args)
 	if (conversion == 'd' || conversion == 'i')
 		return (write_int(va_arg(*args, int), DECIMAL, 10));
 	if (conversion == 'u')
-		return (write_int(va_arg(*args, unsigned int), DECIMAL, 10));
+		return (write_uint(va_arg(*args, unsigned int), DECIMAL, 10));
 	if (conversion == 'x')
-		return (write_int(va_arg(*args, unsigned int), HEX_LOWERCASE, 16));
+		return (write_uint(va_arg(*args, unsigned int), HEX_LOWERCASE, 16));
 	if (conversion == 'X')
-		return (write_int(va_arg(*args, unsigned int), HEX_UPPERCASE, 16));
+		return (write_uint(va_arg(*args, unsigned int), HEX_UPPERCASE, 16));
 	if (conversion == 'p')
 		return (write_pointer(va_arg(*args, uintptr_t)));
 	if (write_char('%') < 0 || write_char(conversion) < 0)
