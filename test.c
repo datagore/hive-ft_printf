@@ -23,33 +23,52 @@
 #define GREEN_OK (ANSI_GREEN "[OK]" ANSI_RESET)
 #define RED_KO   (ANSI_RED   "[KO]" ANSI_RESET)
 
+// Helper macro for printing to standard error output. This is used for
+// displaying the results, since standard output is redirected during testing.
+#define PRINT(...) fprintf(stderr, __VA_ARGS__)
+
 // Run a test case.
-#define TEST_CASE(...) do { \
-		char a[1000] = {0}; \
-		ftruncate(1, 0); \
-		lseek(1, 0, SEEK_SET); \
-		int a_return = ft_printf(__VA_ARGS__); \
-		lseek(1, 0, SEEK_SET); \
-		int a_length = read(1, a, sizeof(a)); \
-		char b[1000] = {0}; \
-		ftruncate(1, 0); \
-		lseek(1, 0, SEEK_SET); \
-		int b_return = printf(__VA_ARGS__); \
-		fflush(stdout); \
-		lseek(1, 0, SEEK_SET); \
-		int b_length = read(1, b, sizeof(b)); \
-		int match = a_return == b_return && a_length == b_length && memcmp(a, b, a_length) == 0; \
-		fprintf(stderr, "%s ", match ? GREEN_OK : RED_KO); \
-		fprintf(stderr, "printf(%s)\n", #__VA_ARGS__); \
-		fprintf(stderr, "    ft_printf: \"" ANSI_YELLOW "%.*s" ANSI_RESET "\" (return: %d)\n", a_length, a, a_return); \
-		fprintf(stderr, "    printf:    \"" ANSI_YELLOW "%.*s" ANSI_RESET "\" (return: %d)\n\n", b_length, b, b_return); \
-		total_passed += !!match; \
-		total_tested++; \
+#define TEST_CASE(...) do {													\
+																			\
+		/* Write the output of ft_printf to buffer `a` */					\
+		char a[1000] = {0};													\
+		ftruncate(1, 0);													\
+		lseek(1, 0, SEEK_SET);												\
+		int a_return = ft_printf(__VA_ARGS__);								\
+		lseek(1, 0, SEEK_SET);												\
+		int a_length = read(1, a, sizeof(a));								\
+																			\
+		/* Write the output of printf to buffer `b` */						\
+		char b[1000] = {0};													\
+		ftruncate(1, 0);													\
+		lseek(1, 0, SEEK_SET);												\
+		int b_return = printf(__VA_ARGS__);									\
+		fflush(stdout);														\
+		lseek(1, 0, SEEK_SET);												\
+		int b_length = read(1, b, sizeof(b));								\
+																			\
+		/* Compare the output of the two functions */						\
+		int lengths_match = a_return == b_return && a_length == b_length;	\
+		int match = lengths_match && memcmp(a, b, a_length) == 0;			\
+																			\
+		/* Print OK or KO next to the function input */						\
+		PRINT("%s ", match ? GREEN_OK : RED_KO);							\
+		PRINT("printf(%s)\n", #__VA_ARGS__);								\
+																			\
+		/* Print the full output of ft_printf and printf */					\
+		PRINT("    ft_printf: \"" ANSI_YELLOW "%.*s", a_length, a);			\
+		PRINT(ANSI_RESET "\" (returned %d)\n", a_return);					\
+		PRINT("       printf: \"" ANSI_YELLOW "%.*s", b_length, b);			\
+		PRINT(ANSI_RESET "\" (returned %d)\n\n", b_return);					\
+																			\
+		/* Keep a tally of tests/passes */									\
+		total_passed += !!match;											\
+		total_tested++;														\
 	} while (0)
 
 int main()
 {
-	// Keep a count of how many test cases passed or failed.
+	// Variables for tallying how many test cases passed or failed.
 	int total_passed = 0;
 	int total_tested = 0;
 
@@ -86,6 +105,6 @@ int main()
 	TEST_CASE("UINT_MAX hexadecimal: %x", UINT_MAX);
 
 	// Print a summary of all test cases.
-	fprintf(stderr, "%d/%d tests passed", total_passed, total_tested);
-	fprintf(stderr, " %s\n", total_passed == total_tested ? GREEN_OK : RED_KO);
+	PRINT("%d/%d tests passed", total_passed, total_tested);
+	PRINT(" %s\n", total_passed == total_tested ? GREEN_OK : RED_KO);
 }
