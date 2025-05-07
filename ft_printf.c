@@ -6,127 +6,63 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/04 12:49:20 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/07 23:52:19 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdarg.h>
-#include <stdint.h>
 #include <unistd.h>
 
 #include "ft_printf.h"
 
-#define DECIMAL "0123456789"
-#define HEX_LOWERCASE "0123456789abcdef"
-#define HEX_UPPERCASE "0123456789ABCDEF"
-
-static int	write_char(char character)
+void	write_arg(t_state *s, char type, va_list *ap)
 {
-	return (write(1, &character, 1));
-}
-
-static int	write_string(const char *string)
-{
-	int	length;
-
-	if (string == NULL)
-		string = "(null)";
-	length = 0;
-	while (string[length] != '\0')
-		length++;
-	return (write(1, string, length));
-}
-
-static int	write_uint(uintptr_t value, const char *digits, uintptr_t base)
-{
-	int	length;
-
-	length = 0;
-	if (value >= base)
-		length = write_uint(value / base, digits, base);
-	if (length < 0 || write_char(digits[value % base]) < 0)
-		return (-1);
-	return (length + 1);
-}
-
-static int	write_int(intptr_t signed_value, const char *digits, intptr_t base)
-{
-	uintptr_t	unsigned_value;
-	int			length;
-
-	unsigned_value = signed_value;
-	if (signed_value < 0)
+	if (type == '%')
+		write_char(s, '%');
+	else if (type == 'c')
+		write_char(s, va_arg(*ap, int));
+	else if (type == 's')
+		write_str(s, va_arg(*ap, const char *));
+	else if (type == 'd' || type == 'i')
+		write_int(s, va_arg(*ap, int), DECIMAL, 10);
+	else if (type == 'u')
+		write_uint(s, va_arg(*ap, unsigned int), DECIMAL, 10);
+	else if (type == 'x')
+		write_uint(s, va_arg(*ap, unsigned int), HEX_LOWER, 16);
+	else if (type == 'X')
+		write_uint(s, va_arg(*ap, unsigned int), HEX_UPPER, 16);
+	else if (type == 'p')
+		write_ptr(s, va_arg(*ap, uintptr_t));
+	else if (type != '\0')
 	{
-		if (write_char('-') < 0)
-			return (-1);
-		unsigned_value = -signed_value;
+		write_char(s, '%');
+		write_char(s, type);
 	}
-	length = write_uint(unsigned_value, digits, base);
-	if (length < 0)
-		return (-1);
-	return (length + (signed_value < 0));
-}
-
-static int	write_pointer(uintptr_t pointer)
-{
-	int	length;
-
-	if (pointer == 0)
-		return (write_string("(nil)"));
-	if (write_string("0x") < 0)
-		return (-1);
-	length = write_uint(pointer, HEX_LOWERCASE, 16);
-	if (length < 0)
-		return (-1);
-	return (length + 2);
-}
-
-static int	write_conversion(char conversion, va_list *args)
-{
-	if (conversion == '\0')
-		return (-1);
-	if (conversion == '%')
-		return (write_char('%'));
-	if (conversion == 'c')
-		return (write_char(va_arg(*args, int)));
-	if (conversion == 's')
-		return (write_string(va_arg(*args, const char *)));
-	if (conversion == 'd' || conversion == 'i')
-		return (write_int(va_arg(*args, int), DECIMAL, 10));
-	if (conversion == 'u')
-		return (write_uint(va_arg(*args, unsigned int), DECIMAL, 10));
-	if (conversion == 'x')
-		return (write_uint(va_arg(*args, unsigned int), HEX_LOWERCASE, 16));
-	if (conversion == 'X')
-		return (write_uint(va_arg(*args, unsigned int), HEX_UPPERCASE, 16));
-	if (conversion == 'p')
-		return (write_pointer(va_arg(*args, uintptr_t)));
-	if (write_char('%') < 0 || write_char(conversion) < 0)
-		return (-1);
-	return (2);
 }
 
 int	ft_printf(const char *format, ...)
 {
-	va_list	args;
-	int		length;
-	int		total;
+	t_state	s;
+	va_list	ap;
+	int		result;
 
 	if (format == NULL)
 		return (-1);
-	va_start(args, format);
-	total = 0;
-	while (*format != '\0' && total >= 0)
+	va_start(ap, format);
+	result = 0;
+	while (*format != '\0' && result >= 0)
 	{
+		s.length = 0;
+		s.output = s.buffer;
 		if (*format == '%')
-			length = write_conversion(*++format, &args);
+			write_arg(&s, *++format, &ap);
 		else
-			length = write_char(*format);
-		total += length;
-		if (length < 0)
-			total = -1;
+			write_char(&s, *format);
+		result += s.length;
+		if (write(1, s.output, s.length) < 0)
+			result = -1;
 		format++;
 	}
-	va_end(args);
-	return (total);
+	va_end(ap);
+	return (result);
 }

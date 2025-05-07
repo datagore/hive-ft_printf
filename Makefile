@@ -1,4 +1,4 @@
-SOURCES := ft_printf.c \
+SOURCES := ft_printf.c write.c \
 
 OBJECTS := $(SOURCES:%.c=%.o)
 
