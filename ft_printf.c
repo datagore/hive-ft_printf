@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/07 23:52:19 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/07 23:56:57 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 
 #include "ft_printf.h"
 
-void	write_arg(t_state *s, char type, va_list *ap)
+static void	write_arg(t_state *s, char type, va_list *ap)
 {
 	if (type == '%')
 		write_char(s, '%');
