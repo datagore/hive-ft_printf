@@ -6,11 +6,9 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 23:51:20 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/07 23:52:42 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/07 23:56:14 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-
-#include <stddef.h>
 
 #include "ft_printf.h"
 
@@ -21,7 +19,7 @@ void	write_char(t_state *s, char chr)
 
 void	write_str(t_state *s, const char *str)
 {
-	if (str == NULL)
+	if (!str)
 		str = "(null)";
 	s->output = str;
 	while (str[s->length] != '\0')
