@@ -6,11 +6,11 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 23:51:20 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/08 10:21:10 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/08 10:46:37 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "common.h"
+#include "ft_printf.h"
 
 void	write_char(t_state *s, char chr)
 {

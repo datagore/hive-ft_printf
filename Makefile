@@ -1,6 +1,6 @@
-SOURCES := printf.c write.c
+SOURCES := ft_printf.c write.c
 OBJECTS := $(SOURCES:%.c=%.o)
-HEADERS := common.h
+HEADERS := ft_printf.h
 NAME := libftprintf.a
 CFLAGS = -Wall -Wextra -Werror
 

@@ -6,14 +6,14 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/08 10:21:17 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/08 10:46:26 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdarg.h>
 #include <unistd.h>
 
-#include "common.h"
+#include "ft_printf.h"
 
 static void	write_arg(t_state *s, char type, va_list *ap)
 {
