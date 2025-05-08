@@ -6,46 +6,50 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 23:51:20 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/08 10:46:37 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/08 21:39:35 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include <unistd.h>
+
 #include "ft_printf.h"
 
-void	write_char(t_state *s, char chr)
+void	write_char(int *res, char character)
 {
-	s->buffer[s->length++] = chr;
+	if (*res < 0)
+		return ;
+	*res += 1;
+	if (write(1, &character, 1) < 1)
+		*res = -1;
 }
 
-void	write_str(t_state *s, const char *str)
+void	write_string(int *res, const char *string)
 {
-	if (!str)
-		str = "(null)";
-	s->output = (char *) str;
-	while (str[s->length] != '\0')
-		s->length++;
+	if (!string)
+		string = "(null)";
+	while (*string != '\0')
+		write_char(res, *string++);
 }
 
-void	write_uint(t_state *s, uintptr_t n, const char *digits, uintptr_t base)
+void	write_uint(int *res, uintptr_t num, const char *digits, uintptr_t base)
 {
-	if (n >= base)
-		write_uint(s, n / base, digits, base);
-	write_char(s, digits[n % base]);
+	if (num >= base)
+		write_uint(res, num / base, digits, base);
+	write_char(res, digits[num % base]);
 }
 
-void	write_int(t_state *s, intptr_t n, const char *digits, intptr_t base)
+void	write_int(int *res, intptr_t num, const char *digits, intptr_t base)
 {
-	if (n >= 0)
-		return (write_uint(s, n, digits, base));
-	write_char(s, '-');
-	write_uint(s, -n, digits, base);
+	if (num >= 0)
+		return (write_uint(res, num, digits, base));
+	write_char(res, '-');
+	write_uint(res, -num, digits, base);
 }
 
-void	write_ptr(t_state *s, void *ptr)
+void	write_pointer(int *res, void *pointer)
 {
-	if (!ptr)
-		return (write_str(s, "(nil)"));
-	write_char(s, '0');
-	write_char(s, 'x');
-	write_uint(s, (uintptr_t) ptr, HEX_LOWER, 16);
+	if (!pointer)
+		return (write_string(res, "(nil)"));
+	write_string(res, "0x");
+	write_uint(res, (uintptr_t) pointer, HEX_LOWER, 16);
 }

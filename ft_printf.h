@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:33:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/08 10:46:06 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/08 21:32:19 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,18 +19,11 @@
 # define HEX_LOWER "0123456789abcdef"
 # define HEX_UPPER "0123456789ABCDEF"
 
-typedef struct s_state
-{
-	char	buffer[20];
-	int		length;
-	char	*output;
-}	t_state;
-
 int		ft_printf(const char *format, ...);
-void	write_char(t_state *s, char chr);
-void	write_str(t_state *s, const char *str);
-void	write_uint(t_state *s, uintptr_t n, const char *digits, uintptr_t base);
-void	write_int(t_state *s, intptr_t n, const char *digits, intptr_t base);
-void	write_ptr(t_state *s, void *ptr);
+void	write_char(int *res, char character);
+void	write_string(int *res, const char *string);
+void	write_uint(int *res, uintptr_t num, const char *digits, uintptr_t base);
+void	write_int(int *res, intptr_t num, const char *digits, intptr_t base);
+void	write_pointer(int *res, void *pointer);
 
 #endif
