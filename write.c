@@ -6,11 +6,11 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 23:51:20 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/07 23:56:14 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/08 10:21:10 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_printf.h"
+#include "common.h"
 
 void	write_char(t_state *s, char chr)
 {
@@ -21,7 +21,7 @@ void	write_str(t_state *s, const char *str)
 {
 	if (!str)
 		str = "(null)";
-	s->output = str;
+	s->output = (char *) str;
 	while (str[s->length] != '\0')
 		s->length++;
 }
@@ -41,11 +41,11 @@ void	write_int(t_state *s, intptr_t n, const char *digits, intptr_t base)
 	write_uint(s, -n, digits, base);
 }
 
-void	write_ptr(t_state *s, uintptr_t value)
+void	write_ptr(t_state *s, void *ptr)
 {
-	if (value == 0)
+	if (!ptr)
 		return (write_str(s, "(nil)"));
 	write_char(s, '0');
 	write_char(s, 'x');
-	write_uint(s, value, HEX_LOWER, 16);
+	write_uint(s, (uintptr_t) ptr, HEX_LOWER, 16);
 }

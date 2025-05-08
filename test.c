@@ -10,7 +10,7 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "ft_printf.h"
+#include "common.h"
 
 // ANSI escape codes.
 #define ANSI_GREEN  "\e[1;32m" // Set the text color to green.
@@ -91,6 +91,7 @@ int main()
 	TEST_CASE("positive decimal: %i", 69);
 	TEST_CASE("negative decimal: %d", -42);
 	TEST_CASE("hexadecimal: %x", 0xc0de);
+	TEST_CASE("hexadecimal zero: %x", 0);
 	TEST_CASE("hexadecimal uppercase: %X", 0xBEEF);
 	TEST_CASE("hexadecimal negative: %X", -0xff);
 	TEST_CASE("valid pointer: %p", main);

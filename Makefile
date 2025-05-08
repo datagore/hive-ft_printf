@@ -1,29 +1,27 @@
-SOURCES := ft_printf.c write.c \
-
+SOURCES := printf.c write.c
 OBJECTS := $(SOURCES:%.c=%.o)
-
-HEADERS := ft_printf.h
+HEADERS := common.h
 NAME := libftprintf.a
 CFLAGS = -Wall -Wextra -Werror
 
 $(NAME): $(OBJECTS)
-	ar -rcs $@ $^
+	$(AR) -rcs $@ $^
 
 %.o: %.c $(HEADERS)
-	cc -c $< -o $@ $(CFLAGS)
+	$(CC) -c $< -o $@ $(CFLAGS)
 
 all: $(NAME)
 
 re: fclean all
 
 clean:
-	rm -f $(OBJECTS) $(BONUS_OBJECTS) test
+	$(RM) $(OBJECTS) $(BONUS_OBJECTS) test
 
 fclean: clean
-	rm -f $(NAME)
+	$(RM) $(NAME)
 
 test: test.c $(NAME)
-	cc $^ -o $@ $(CFLAGS)
+	$(CC) $^ -o $@ $(CFLAGS)
 	./$@
 
 .PHONY: all re fclean clean bonus test

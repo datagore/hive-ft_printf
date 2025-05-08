@@ -6,14 +6,14 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/07 23:56:57 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/08 10:21:17 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <stdarg.h>
 #include <unistd.h>
 
-#include "ft_printf.h"
+#include "common.h"
 
 static void	write_arg(t_state *s, char type, va_list *ap)
 {
@@ -22,7 +22,7 @@ static void	write_arg(t_state *s, char type, va_list *ap)
 	else if (type == 'c')
 		write_char(s, va_arg(*ap, int));
 	else if (type == 's')
-		write_str(s, va_arg(*ap, const char *));
+		write_str(s, va_arg(*ap, char *));
 	else if (type == 'd' || type == 'i')
 		write_int(s, va_arg(*ap, int), DECIMAL, 10);
 	else if (type == 'u')
@@ -32,7 +32,7 @@ static void	write_arg(t_state *s, char type, va_list *ap)
 	else if (type == 'X')
 		write_uint(s, va_arg(*ap, unsigned int), HEX_UPPER, 16);
 	else if (type == 'p')
-		write_ptr(s, va_arg(*ap, uintptr_t));
+		write_ptr(s, va_arg(*ap, void *));
 	else if (type != '\0')
 	{
 		write_char(s, '%');
