@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/05/07 23:51:20 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/08 21:39:35 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/09 10:22:16 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,19 +31,19 @@ void	write_string(int *res, const char *string)
 		write_char(res, *string++);
 }
 
-void	write_uint(int *res, uintptr_t num, const char *digits, uintptr_t base)
+void	write_uint(int *res, const char *digits, uintptr_t base, uintptr_t num)
 {
 	if (num >= base)
-		write_uint(res, num / base, digits, base);
+		write_uint(res, digits, base, num / base);
 	write_char(res, digits[num % base]);
 }
 
-void	write_int(int *res, intptr_t num, const char *digits, intptr_t base)
+void	write_int(int *res, const char *digits, intptr_t base, intptr_t num)
 {
 	if (num >= 0)
-		return (write_uint(res, num, digits, base));
+		return (write_uint(res, digits, base, num));
 	write_char(res, '-');
-	write_uint(res, -num, digits, base);
+	write_uint(res, digits, base, -num);
 }
 
 void	write_pointer(int *res, void *pointer)
@@ -51,5 +51,5 @@ void	write_pointer(int *res, void *pointer)
 	if (!pointer)
 		return (write_string(res, "(nil)"));
 	write_string(res, "0x");
-	write_uint(res, (uintptr_t) pointer, HEX_LOWER, 16);
+	write_uint(res, HEX_LOWER, 16, (uintptr_t) pointer);
 }

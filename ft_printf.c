@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/09 09:45:09 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/09 10:20:13 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,13 +24,13 @@ static void	write_conversion(int *res, char type, va_list *arguments)
 	else if (type == 's')
 		write_string(res, va_arg(*arguments, const char *));
 	else if (type == 'i' || type == 'd')
-		write_int(res, va_arg(*arguments, int), DECIMAL, 10);
+		write_int(res, DECIMAL, 10, va_arg(*arguments, int));
 	else if (type == 'u')
-		write_uint(res, va_arg(*arguments, unsigned int), DECIMAL, 10);
+		write_uint(res, DECIMAL, 10, va_arg(*arguments, unsigned int));
 	else if (type == 'x')
-		write_uint(res, va_arg(*arguments, unsigned int), HEX_LOWER, 16);
+		write_uint(res, HEX_LOWER, 16, va_arg(*arguments, unsigned int));
 	else if (type == 'X')
-		write_uint(res, va_arg(*arguments, unsigned int), HEX_UPPER, 16);
+		write_uint(res, HEX_UPPER, 16, va_arg(*arguments, unsigned int));
 	else if (type == 'p')
 		write_pointer(res, va_arg(*arguments, void *));
 	else
