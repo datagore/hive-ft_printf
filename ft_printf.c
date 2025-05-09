@@ -6,7 +6,7 @@
 /*   By: abostrom <abostrom@student.hive.fi>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/04/29 17:32:08 by abostrom          #+#    #+#             */
-/*   Updated: 2025/05/08 21:42:49 by abostrom         ###   ########.fr       */
+/*   Updated: 2025/05/09 09:43:30 by abostrom         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ int	ft_printf(const char *format, ...)
 
 	res = 0;
 	va_start(arguments, format);
-	while (*format != '\0' && res >= 0)
+	while (format != NULL && *format != '\0' && res >= 0)
 	{
 		if (*format == '%')
 			write_conversion(&res, *++format, &arguments);
